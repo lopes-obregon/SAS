@@ -15,7 +15,7 @@ class Sessao{
             let usuario_valido = false;
             try {
                 await banco.get(sql).then(resultado =>{
-                    //console.log("Resultado:",resultado);
+                    console.log("Resultado:",resultado);
                     if(brcypt.compareSync(sessao.senha, resultado.senha) == true){
                         usuario_valido = true;
                     }

@@ -4,6 +4,7 @@ const routes = express.Router();
 //const Paciente = require('./entidade/Paciente');
 const usuarioView = require('./view/usuarioView');
 const sessionView = require('./view/sessaoView');
+const agendamentoView = require('./view/agendamentoView');
 //fim imports
 //variavel
 
@@ -42,4 +43,8 @@ routes.post('/session', async (req, res)=>{
     let usuario_valido = await sessionView.verificaSenha(req.body)
     res.json(usuario_valido);
 });
+routes.post('/agendamento', async(req, res)=>{
+    let agendamento_mensagem = await agendamentoView.inserirAgendamento(req.body)
+    res.json(agendamento_mensagem);
+})
 module.exports = routes;

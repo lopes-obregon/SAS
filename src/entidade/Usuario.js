@@ -42,9 +42,9 @@ class Usuario extends Paciente{
             let banco = await bd.openDb();
             let n_paciente_mesmo_atributo = 0;
             try{
-                let sql = `SELECT COUNT(idusuario) from usuario WHERE  login='teste2@email.com'`;
+                let sql = `SELECT COUNT(idusuario) from usuario WHERE  login=${usuario.login}`;
                 await banco.exec(sql).then(result =>{
-                    n_paciente_mesmo_atributo = resultado;
+                    n_paciente_mesmo_atributo = result;
                 }).catch(error => console.log("Algo deu errado na contagem"));
                 if(n_paciente_mesmo_atributo > 0){
                     return true;
