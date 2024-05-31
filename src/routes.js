@@ -10,12 +10,27 @@ const agendamentoView = require('./view/agendamentoView');
 
 //rotas usuario 
 //rota para inserção de usuario
-routes.post('/users', (req, res)=>{
-    let inserir_paciente_mensagem = usuarioView.inserirPaciente(req.body);
-    res.json(inserir_paciente_mensagem);
-    let inserir_usuario_mensagem = usuarioView.inserirUsuario();
-    res.json(inserir_usuario_mensagem);
+routes.post('/users', async (req, res) => {
+    try {
+        let inserir_paciente_mensagem = await usuarioView.inserirPaciente(req.body);
+        
+        if (inserir_paciente_mensagem?.error) {
+            return res.status(400).json({ message: inserir_paciente_mensagem.error });
+        }
+
+        let inserir_usuario_mensagem = await usuarioView.inserirUsuario(req.body);
+        
+        if (inserir_usuario_mensagem?.error) {
+            return res.status(400).json({ message: inserir_usuario_mensagem.error });
+        }
+
+        res.status(201).json({ message: 'Paciente e usuário inseridos com sucesso' });
+    } catch (error) {
+        console.error("Erro ao inserir paciente e usuário:", error);
+        res.status(500).json({ message: 'Erro ao inserir paciente e usuário' });
+    }
 });
+
 
 
 //routes.get('/users', userControle.index);

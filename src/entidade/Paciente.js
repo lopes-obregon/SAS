@@ -20,17 +20,21 @@ class Paciente{
     static async  inserirPaciente(paciente){
         //método que cadastra o paciente no banco de dados 
         let banco = await bd.openDb();
-        let mensagem = null;
+
         try {
             let sql = `INSERT INTO paciente (cpf, nome, data_nascimento, cadastro_sus, endereco, unidade_de_saude) VALUES(${paciente.cpf}, '${paciente.nome}', '${paciente.data_nascimento}', '${paciente.cadastro_sus}', '${paciente.endereco}', '${paciente.unidade_saude}')`;
-            await banco.exec(sql).catch(error =>{
+            console.log(sql);
+            await banco.exec(sql).then(()=>{
+                return { success:true, message:"Paciente inserido com sucesso"};
+            }).catch(error =>{
                 console.log("Error na inserção:", error);
                 mensagem = "Error ao inserir o Paciente";
+                return { error: 'Erro ao inserir o Paciente' };
             })
         }finally{
             banco.close();
         }
-        return mensagem;
+
     }
     static async  pacienteMesmoAtributos(paciente){
         //método para ver paciente com mesmo atributo.
@@ -38,10 +42,10 @@ class Paciente{
         let banco = await bd.openDb();
         let n_paciente_mesmo_atributo = 0;
         try{
-            let sql = `SELECT COUNT(cpf) from paciente WHERE  nome='${paciente.nome}' AND cadastro_sus='${paciente.cadastro_sus}'`;
-            await banco.exec(sql).then(resultado =>{
-                n_paciente_mesmo_atributo = resultado;
-            }).catch(error => console.log("Algo deu errado na contagem"));
+            let sql = `SELECT COUNT(cpf) AS count from paciente WHERE  nome='${paciente.nome}' AND cadastro_sus='${paciente.cadastro_sus}'`;
+            await banco.get(sql).then(resultado =>{
+                n_paciente_mesmo_atributo = resultado.count;
+            }).catch(error => console.log("Algo deu errado na contagem:", error));
             if(n_paciente_mesmo_atributo > 0){
                 return true;
             }else{

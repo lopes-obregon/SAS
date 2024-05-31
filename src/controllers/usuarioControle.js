@@ -1,18 +1,20 @@
 const Paciente = require('../entidade/Paciente');
 const Usuario = require('../entidade/Usuario');
-function inserirPaciente(paciente){
+async function inserirPaciente(paciente){
     
     
-    if(!Paciente.pacienteMesmoAtributos(paciente)){
+    if(!await Paciente.pacienteMesmoAtributos(paciente)){
         //retorna uma mensagem;
-        return Paciente.inserirPaciente(paciente);
+        return await Paciente.inserirPaciente(paciente);
     }else{
-        return "Paciente Já cadastrado!";
+        return { error: "Paciente Já cadastrado!" };
     }
 }
 async function inserirUsuario(usuario){
     if(!await Usuario.usuarioMesmoAtributos(usuario)){
         return await Usuario.inserirUsuario(usuario);
+    }else{
+        return { error: "Usuário já cadastrado!" };
     }
 }
 async function obterUsuario(usuario){

@@ -11,30 +11,20 @@ function obterPacienteInformado(dados){
 //inserindo dados de paciente
 function inserirPaciente(dados){
     USUARIO_GLOBAL = obterPacienteInformado(dados);
-    let mensagem_erro = null;
     if(USUARIO_GLOBAL != null){
-        mensagem_erro = controle.inserirPaciente(USUARIO_GLOBAL);
+        return controle.inserirPaciente(USUARIO_GLOBAL);
     }else{
-        mensagem_erro = "Algum atributo não foi informado";
+        //mensagem_erro = "Algum atributo não foi informado";
+        return { error: "Algum atributo não informado!" };
     }
-    if(mensagem_erro ===null){
-        mensagem_erro = "Aconteceu um erro inesperado!";
-    }
-    return mensagem_erro;
 }
 //inserindo dados de usuario 
 function inserirUsuario(){
-    let mensagem_erro = null;
     if(USUARIO_GLOBAL != null){
-        mensagem_erro = controle.inserirUsuario(USUARIO_GLOBAL)
+        return controle.inserirUsuario(USUARIO_GLOBAL);
     }else{
-        mensagem_erro = "Algum atributo não foi informado";
+        return { error: "Algum atributo não foi informado" };
     }
-
-    if(mensagem_erro ===null){
-        mensagem_erro = "Aconteceu um erro inesperado!";
-    }
-    return mensagem_erro;
 }
 //parte que não se cadastra mas já realiza o login diretamente ou se cadastra e realiza o login
 function obterUsuarioInformado(dados){
