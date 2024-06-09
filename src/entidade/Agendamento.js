@@ -2,7 +2,7 @@
 const bd = require('../database/config');
 
 class Agendamento{
-    constructor(data_hora = Date, nome_paciente, cartão_sus){
+    constructor(data_hora = Date, nome_paciente="", cartão_sus="", filhos=[]){
         if (data_hora instanceof Date){
             //inteiro com dia do mes de 1 até 31
             this.dia_do_mes = data_hora.getDate();
@@ -17,6 +17,7 @@ class Agendamento{
             //nome do paciente
             this.nome_paciente = nome_paciente;
             this.cartão_sus = cartão_sus;
+            this.filhos = filhos;
 
         }
     }
@@ -33,7 +34,7 @@ class Agendamento{
     }
     static async createPacienteSemCadastro(){
         let banco = await bd.openDb();
-        let sql = 'CREATE TABLE IF NOT EXISTS pacienteS(id INTEGER  PRIMARY KEY AUTOINCREMENT, nome TEXT, cartao_sus TEXT)';
+        let sql = 'CREATE TABLE IF NOT EXISTS pacienteS(id INTEGER  PRIMARY KEY AUTOINCREMENT, nome TEXT, cartao_sus TEXT, cadastro_sus TEXT NOT NULL, FOREIGN KEY(cadastro_sus) REFERENCES paciente(cadastro_sus) ON DELETE NO ACTION ON UPDATE NO ACTION)';
         try{
             await banco.exec(sql).catch(err=>{
                  console.log("Error ao criar a tabela:", err);
@@ -81,21 +82,35 @@ class Agendamento{
         }
     }
     static async pacienteNãoExistente(agendamento){
+        let sql = "";
         if(agendamento instanceof Agendamento){
             //cadastrar o paciente que não tem usuario
             let banco = await bd.openDb();
-            let sql = `INSERT INTO pacienteS(nome, cartao_sus) VALUES('${agendamento.nome_paciente}', '${agendamento.cartão_sus}')`;
-            await banco.exec(sql).catch(err =>{
-                console.log("Error na inserção:", error);
-                return "Error ao inserir o Paciente sem Login";
-            })
+           // let sql = `INSERT INTO pacienteS(nome, cartao_sus) VALUES('${agendamento.nome_paciente}', '${agendamento.cartão_sus}')`;
+            //algum filho existente
+            if(agendamento.filhos.length > 0){
+                for (const filho of agendamento.filhos) {
+                    sql = `INSERT INTO pacienteS(nome, cartao_sus, cadastro_sus) VALUES('${filho?.nome_paciente}', '${filho?.cartão_sus}', '${agendamento.cartão_sus}')`;
+                    await banco.exec(sql).catch(err =>{
+                            console.log("Error na inserção:", err);
+                            return "Error ao inserir o Paciente sem Login";
+                        })
+                    
+                }
+                
+            }
+            
             //agora cadastrar o agendamento
-            sql = `INSERT INTO agendamento(dia, mes, hora, minuto, cadastro_sus) VALUES (${agendamento.dia_do_mes}, ${agendamento.mes}, ${agendamento.hora}, ${agendamento.minuto}, '${agendamento.cartão_sus}')`;
+
             try{
-                await banco.exec(sql).catch(err =>{
-                    console.log("Error na inserção:", error);
-                    return "Error ao inserir o Agendamento";
-                })
+                for(const filho of agendamento?.filhos){
+                    sql = `INSERT INTO agendamento(dia, mes, hora, minuto, cadastro_sus) VALUES (${agendamento.dia_do_mes}, ${agendamento.mes}, ${agendamento.hora}, ${agendamento.minuto}, '${filho?.cartão_sus}')`;
+                    
+                    await banco.exec(sql).catch(err =>{
+                        console.log("Error na inserção:", err);
+                        return "Error ao inserir o Agendamento";
+                    })
+                }
             }finally{
                 await banco.close();
             }
@@ -105,6 +120,59 @@ class Agendamento{
                     
         }
     }
+    static async createDataHora(){
+        let sql = 'CREATE TABLE IF NOT EXISTS datahora(id INTEGER  PRIMARY KEY AUTOINCREMENT, data TEXT, hora TEXT)';
+        let banco = await bd.openDb();
+        try{
+            banco.exec(sql);
+            console.log("Tabela 'datahora' criado com sucesso!")
+        }finally{
+            await banco.close();
+        }
+    }
+
+    static async getDataHora(data_informada) {
+        let json = { datas: [] };
+    
+        // Verifica se data_informada é uma instância válida de Date
+        if (!(data_informada instanceof Date) || isNaN(data_informada)) {
+            throw new RangeError('Invalid time value');
+        }
+    
+        let banco = await bd.openDb();
+        //let data_formatada = data_informada.toISOString().slice(0, 10);
+        //console.log("data informada: " + data_formatada);
+    
+        let sql = `SELECT * FROM datahora `;
+    
+        try {
+            await banco.all(sql).then(resultado => {
+                console.log("Resultado");
+                console.log(resultado[0]);
+                //json.datas = resultado;
+                resultado.forEach(elemento =>{
+                    //jeito de corrigir o erro de passar string e dias sairem todos errados
+                    var data_array = elemento?.data.split("-");
+                    var data_banco = new Date(parseInt(data_array[0]), parseInt(data_array[1]), parseInt(data_array[2]));
+                    console.log(data_banco);
+                    var dia = data_banco.getDate();
+                    var mes = data_banco.getMonth();
+                    var ano = data_banco.getFullYear();
+                    if((dia >= data_informada.getDate()) && (mes >= data_informada.getMonth()) && (ano >= data_informada.getFullYear()) ){
+                        json.datas.push(elemento);
+                    }
+                });
+                
+            });
+    
+            console.log("json");
+            console.log(json.datas);
+            return json;
+        } finally {
+            banco.close();
+        }
+    }
+    
 
 }
 

@@ -9,5 +9,8 @@ async function inserirAgendamento(agendamento){
     }
     return mensagem;
 }
+async function obterDataHora(data_infomada){
+    return await Agendamento.getDataHora(data_infomada);
+}
 
-module.exports = {inserirAgendamento};
+module.exports = {inserirAgendamento, obterDataHora};

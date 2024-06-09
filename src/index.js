@@ -14,6 +14,7 @@ Paciente.createTable();
 Usuario.createTable();
 Agendamento.createAgendamento();
 Agendamento.createPacienteSemCadastro();
+Agendamento.createDataHora();
 //adicionar json para a aplixação entender seu uso.
 app.use(express.json());
 //usa a const rotas
