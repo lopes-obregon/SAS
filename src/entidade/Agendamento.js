@@ -45,25 +45,31 @@ class Agendamento{
     }
     static async isPacienteExistente(agendamento){
         let num_paciente_existente = 0;
+       
         if(agendamento instanceof Agendamento){
-            let banco = await bd.openDb();
-            let sql = `SELECT COUNT(cpf)  AS count from paciente WHERE cadastro_sus ='${agendamento.cartão_sus}'`;
-            try{
-                /*await banco.exec(sql).then(result =>{
-                    console.log("resultado da busca:", result);
-                    num_paciente_existente = result;
-                });*/
-                await banco.get(sql).then(result=> num_paciente_existente = result.count);
-                console.log("num Paciente depois da consulta:", num_paciente_existente);
-                if(num_paciente_existente > 0){
-                    return true;
-                }else{
-                    return false;
+            if(agendamento.filhos === null){
+                let banco = await bd.openDb();
+                let sql = `SELECT COUNT(cpf)  AS count from paciente WHERE cadastro_sus ='${agendamento.cartão_sus}'`;
+                try{
+                    /*await banco.exec(sql).then(result =>{
+                        console.log("resultado da busca:", result);
+                        num_paciente_existente = result;
+                    });*/
+                    await banco.get(sql).then(result=> num_paciente_existente = result.count);
+                    console.log("num Paciente depois da consulta:", num_paciente_existente);
+                    if(num_paciente_existente > 0){
+                        return true;
+                    }else{
+                        return false;
+                    }
+                }finally{
+                    await banco.close();
                 }
-            }finally{
-                await banco.close();
+            }else{
+                return false;
             }
-        }
+
+            }
     }
     static async pacienteExistente(agendamento){
         if(agendamento instanceof Agendamento){
