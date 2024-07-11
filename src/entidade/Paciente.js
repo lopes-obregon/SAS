@@ -8,7 +8,8 @@ class Paciente {
     data_nascimento = "",
     cadastro_sus = "",
     endereco = "",
-    unidade_de_saude = ""
+    unidade_de_saude = "",
+    idade = ""
   ) {
     this.cpf = cpf;
     this.nome = nome;
@@ -16,6 +17,7 @@ class Paciente {
     this.cadastro_sus = cadastro_sus;
     this.endereco = endereco;
     this.unidade_de_saude = unidade_de_saude;
+    this.idade = idade;
   }
   //método para inserir paciente usuario no banco de dados
   setCpf(novo_cpf) {
@@ -72,7 +74,7 @@ class Paciente {
   static async createTable() {
     let banco = await bd.openDb();
     let sql =
-      "CREATE TABLE IF NOT EXISTS paciente(cpf INTEGER NOT NULL PRIMARY KEY, nome TEXT, data_nascimento TEXT, cadastro_sus TEXT, endereco TEXT, unidade_de_saude TEXT)";
+      "CREATE TABLE IF NOT EXISTS paciente(cpf INTEGER NOT NULL PRIMARY KEY, nome TEXT, data_nascimento TEXT, cadastro_sus TEXT, endereco TEXT, unidade_de_saude TEXT, idade TEXT)";
     try {
       await banco.exec(sql).catch((err) => {
         console.log("Error ao criar a tabela Paciente!");

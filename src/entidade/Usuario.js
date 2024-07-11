@@ -104,19 +104,21 @@ class Usuario extends Paciente {
       //verifica se é instancia de usuario
       if (usuario instanceof Usuario) {
         //realiza a sql
-        let sql = `SELECT paciente.cpf, paciente.nome, paciente.data_nascimento, paciente.cadastro_sus, paciente.endereco, paciente.unidade_de_saude FROM usuario JOIN paciente ON usuario.paciente_cpf = paciente.cpf WHERE usuario.login = '${usuario.login}'`;
+        let sql = `SELECT paciente.cpf, paciente.nome, paciente.data_nascimento, paciente.cadastro_sus, paciente.endereco, paciente.unidade_de_saude, usuario.permissoes FROM usuario JOIN paciente ON usuario.paciente_cpf = paciente.cpf WHERE usuario.login = '${usuario.login}'`;
 
         //realiza a consulta e retorna uma unica linha
         await banco.get(sql).then((resultado) => {
           /**
            * depois da consulta seta os atributos da classe usuario
            */
+
           usuario.cpf = resultado.cpf;
           usuario.nome = resultado.nome;
           usuario.data_nascimento = resultado.data_nascimento;
           usuario.cadastro_sus = resultado.cadastro_sus;
           usuario.endereco = resultado.endereco;
           usuario.unidade_de_saude = resultado.unidade_de_saude;
+          usuario.permissao = resultado?.permissoes;
         });
       }
     } finally {
