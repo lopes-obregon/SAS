@@ -68,4 +68,9 @@ routes.put("/agendamento", async (req, res) => {
   res.json(data_hora);
 });
 
+routes.put("/meusagendamentos", async (req, res) => {
+  let meus_agendamentos = await agendamentoView.obterMeusAgendamentos(req.body);
+  res.json(meus_agendamentos);
+});
+
 module.exports = routes;

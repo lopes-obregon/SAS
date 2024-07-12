@@ -20,4 +20,9 @@ async function obterDataHora(data_infomada) {
   return await Agendamento.getDataHora(data_infomada);
 }
 
-module.exports = { inserirAgendamento, obterDataHora };
+async function obterMeusAgendamentos(cadastro_sus) {
+  console.log("Obtendo agendamentos na controller");
+  return await Agendamento.getMeusAgendamentos(cadastro_sus);
+}
+
+module.exports = { inserirAgendamento, obterDataHora, obterMeusAgendamentos };

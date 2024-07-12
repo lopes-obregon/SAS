@@ -105,4 +105,14 @@ async function obterDataHora(dados) {
     }
   }
 }
-module.exports = { inserirAgendamento, obterDataHora };
+async function obterMeusAgendamentos(dados) {
+  let cadastro_sus = dados?.cadastro_sus;
+  console.log("Cadastro sus na view", cadastro_sus);
+  console.log(cadastro_sus != null && cadastro_sus != "");
+  if (cadastro_sus != null && cadastro_sus != "") {
+    console.log("chamando o método");
+
+    return await controle.obterMeusAgendamentos(cadastro_sus);
+  }
+}
+module.exports = { inserirAgendamento, obterDataHora, obterMeusAgendamentos };

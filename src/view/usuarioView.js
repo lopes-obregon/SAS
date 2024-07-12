@@ -5,20 +5,7 @@ var USUARIO_GLOBAL = null;
 function obterPacienteInformado(dados) {
   let cpf_num = parseInt(dados.cpf);
   //verificar se existe o método fornecido
-  if (dados?.cadastro_sus) {
-    let usuario = new Usuario(
-      cpf_num,
-      dados.nome,
-      dados.data_nascimento,
-      dados.cadastro_sus,
-      dados.endereco,
-      dados.unidade_saude,
-      dados.usuario,
-      dados.senha,
-      "2"
-    );
-    return usuario;
-  } else if (dados?.cnes) {
+  if (dados?.cnes) {
     //médico
     console.log("Médico:");
     let usuario = new Usuario(
@@ -34,6 +21,20 @@ function obterPacienteInformado(dados) {
     );
     console.log(usuario);
     return usuario;
+  } else if (dados?.cadastro_sus) {
+    console.log("dados do usuário como usuário:", dados);
+    let usuario = new Usuario(
+      cpf_num,
+      dados.nome,
+      dados.data_nascimento,
+      dados.cadastro_sus,
+      dados.endereco,
+      dados?.unidade_de_saude,
+      dados.usuario,
+      dados.senha,
+      "2"
+    );
+    return usuario;
   } else {
     return null;
   }
@@ -42,6 +43,7 @@ function obterPacienteInformado(dados) {
 function inserirPaciente(dados) {
   USUARIO_GLOBAL = obterPacienteInformado(dados);
   if (USUARIO_GLOBAL != null) {
+    console.log("Usuário global:", USUARIO_GLOBAL);
     return controle.inserirPaciente(USUARIO_GLOBAL);
   } else {
     //mensagem_erro = "Algum atributo não foi informado";

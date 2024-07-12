@@ -46,7 +46,7 @@ class Agendamento extends Paciente {
   static async createAgendamento() {
     let banco = await bd.openDb();
     let sql =
-      "CREATE TABLE IF NOT EXISTS agendamento(id INTEGER  PRIMARY KEY AUTOINCREMENT, dia INTEGER, mes INTEGER, hora INTEGER, minuto INTEGER, cadastro_sus TEXT NOT NULL, cnes TEXT ,FOREIGN KEY(cadastro_sus) REFERENCES paciente(cadastro_sus) ON DELETE NO ACTION ON UPDATE NO ACTION )";
+      "CREATE TABLE IF NOT EXISTS agendamento(id INTEGER  PRIMARY KEY AUTOINCREMENT, dia INTEGER, mes INTEGER, hora INTEGER, minuto INTEGER, cadastro_sus TEXT NOT NULL, cnes TEXT ,FOREIGN KEY(cadastro_sus, cnes) REFERENCES paciente(cadastro_sus) ON DELETE NO ACTION ON UPDATE NO ACTION )";
     try {
       await banco.exec(sql).catch((err) => {
         console.log("Error ao criar a tabela:", err);
@@ -102,7 +102,7 @@ class Agendamento extends Paciente {
   static async pacienteExistente(agendamento) {
     if (agendamento instanceof Agendamento) {
       let banco = await bd.openDb();
-      if (agendamento.permissão == "2") {
+      if (agendamento.permissão == "1") {
         let sql = `INSERT INTO agendamento(dia, mes, hora, minuto, cadastro_sus, cnes) VALUES (${agendamento.data_hora.getDate()}, ${
           agendamento.data_hora.getMonth() + 1
         }, ${agendamento.data_hora.getHours()}, ${agendamento.data_hora.getMinutes()}, '${
@@ -250,6 +250,30 @@ class Agendamento extends Paciente {
       banco.close();
     }
   }
+  static async getMeusAgendamentos(cadastro_sus) {
+    let banco = await bd.openDb();
+    let sql = `SELECT * FROM agendamento WHERE cadastro_sus= '${cadastro_sus}'`;
+    console.log("Get meus agendamentos no agendamentos");
+    let json = { agendamentos: [], médicos: [] };
+    await banco.all(sql).then((result) => {
+      json.agendamentos = result;
+    });
+    console.log("agendamentos como json", json);
+    let medicos_array = [];
+    json.agendamentos.forEach((elemento) => {
+      console.log("Meu elemento:", elemento?.cnes);
+      medicos_array.push(elemento?.cnes);
+    });
+    console.log("medicos no array", medicos_array);
+    const placeholders = medicos_array.map(() => "?").join(",");
+    sql = `SELECT paciente.nome, paciente.cadastro_sus FROM paciente JOIN agendamento ON paciente.cadastro_sus = agendamento.cnes WHERE agendamento.cnes IN (${placeholders})`;
+    console.log(sql);
+    await banco.all(sql, medicos_array).then((result) => {
+      console.log(result);
+      json.médicos = result;
+    });
+    console.log("json completo:", json);
+    return json;
+  }
 }
-
 module.exports = Agendamento;

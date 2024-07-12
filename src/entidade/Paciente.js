@@ -52,22 +52,29 @@ class Paciente {
     //método para ver paciente com mesmo atributo.
     //retornando caso o objeto passado tenha o mesmo atributos.
     let banco = await bd.openDb();
+    console.log("Paciente no mesmo atributos:", paciente);
     let n_paciente_mesmo_atributo = 0;
-    try {
-      let sql = `SELECT COUNT(cpf) AS count from paciente WHERE  nome='${paciente.nome}' AND cadastro_sus='${paciente.cadastro_sus}'`;
-      await banco
-        .get(sql)
-        .then((resultado) => {
-          n_paciente_mesmo_atributo = resultado.count;
-        })
-        .catch((error) => console.log("Algo deu errado na contagem:", error));
-      if (n_paciente_mesmo_atributo > 0) {
-        return true;
-      } else {
-        return false;
+    if (paciente instanceof Paciente) {
+      try {
+        let sql = `SELECT COUNT(cpf) AS count from paciente WHERE  nome='${paciente.nome}' AND cadastro_sus='${paciente.cadastro_sus}'`;
+        console.log("sql do cadastro como paciente:", sql);
+        await banco
+          .get(sql)
+          .then((resultado) => {
+            n_paciente_mesmo_atributo = resultado.count;
+          })
+          .catch((error) => console.log("Algo deu errado na contagem:", error));
+        console.log("Nº paciente mesmo atributo:", n_paciente_mesmo_atributo);
+        if (n_paciente_mesmo_atributo > 0) {
+          console.log("Já existe");
+          return true;
+        } else {
+          console.log("Não existe");
+          return false;
+        }
+      } finally {
+        banco.close();
       }
-    } finally {
-      banco.close();
     }
   }
   //método para criar a tabela no banco de daods
