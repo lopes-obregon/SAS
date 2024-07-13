@@ -38,10 +38,21 @@ function obterAgendamentoInformado(dados) {
       );
     } else {
       if (dados?.user?.permissao == "1") {
-        let cnes_int = dados?.user?.cpf.toString();
+        let cpf_int = 0;
+        let cnes_str = "";
+        if (typeof dados?.cpf === "number") {
+          cpf_int = dados?.cpf;
+        } else {
+          cpf_int = parseInt(dados?.cpf);
+        }
+        if (typeof dados?.user?.cadastro_sus === "number") {
+          cnes_str = dados?.user?.cadastro_sus.toString();
+        } else {
+          cnes_str = dados?.user?.cadastro_sus;
+        }
         agendamento = new Agendamento(
           new Date(ano_int, mes_int, dia_int, hora_int, minutos_int),
-          dados?.cpf,
+          cpf_int,
           dados?.nome,
           dados?.data_nascimento,
           dados?.card_sus,
@@ -50,7 +61,7 @@ function obterAgendamentoInformado(dados) {
           dados?.idade,
           [],
           dados?.user?.permissao,
-          cnes_int
+          cnes_str
         );
       } else {
         //se for paciente

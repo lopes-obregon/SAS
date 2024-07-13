@@ -139,36 +139,48 @@ class Agendamento extends Paciente {
     //cadastrar o paciente que não tem usuario
     let banco = await bd.openDb();
     if (agendamento instanceof Agendamento) {
+      console.log("Agendamento:", agendamento);
+      console.log("Permissão do agendamento:", agendamento.permissão);
       if (agendamento.permissão == "2") {
         // let sql = `INSERT INTO pacienteS(nome, cartao_sus) VALUES('${agendamento.nome_paciente}', '${agendamento.cartão_sus}')`;
         //algum filho existente
         if (agendamento.filhos.length > 0) {
           for (const filho of agendamento.filhos) {
-            sql = `INSERT INTO pacienteS(nome, cartao_sus, cadastro_sus) VALUES('${filho?.nome_paciente}', '${filho?.cartão_sus}', '${agendamento.cartão_sus}')`;
+            sql = `INSERT INTO pacienteS(nome, cartao_sus, cadastro_sus) VALUES('${filho?.nome_paciente}', '${filho?.cartão_sus}', '${agendamento.cadastro_sus}')`;
             await banco.exec(sql).catch((err) => {
               console.log("Error na inserção:", err);
               return "Error ao inserir o Paciente sem Login";
             });
           }
-        }
+          //agora cadastrar o agendamento
 
-        //agora cadastrar o agendamento
-
-        try {
-          for (const filho of agendamento?.filhos) {
-            sql = `INSERT INTO agendamento(dia, mes, hora, minuto, cadastro_sus) VALUES (${agendamento.data_hora.getDate()}, ${
-              agendamento.data_hora.getMonth() + 1
-            }, ${agendamento.data_hora.getHours()}, ${agendamento.data_hora.getMinutes()}, '${
-              filho?.cartão_sus
-            }')`;
-
-            await banco.exec(sql).catch((err) => {
-              console.log("Error na inserção:", err);
-              return "Error ao inserir o Agendamento";
-            });
+          try {
+            for (const filho of agendamento?.filhos) {
+              if (filho?.cadastro_sus) {
+                sql = `INSERT INTO agendamento(dia, mes, hora, minuto, cadastro_sus) VALUES (${agendamento.data_hora.getDate()}, ${
+                  agendamento.data_hora.getMonth() + 1
+                }, ${agendamento.data_hora.getHours()}, ${agendamento.data_hora.getMinutes()}, '${
+                  filho?.cartão_sus
+                }')`;
+              }
+              console.log("sql filho", sql);
+              await banco.exec(sql).catch((err) => {
+                console.log("Error na inserção:", err);
+                return "Error ao inserir o Agendamento";
+              });
+            }
+          } finally {
+            await banco.close();
           }
-        } finally {
-          await banco.close();
+        } else {
+          sql = `INSERT INTO agendamento(dia, mes, hora, minuto, cadastro_sus) VALUES (${agendamento.data_hora.getDate()}, ${agendamento.data_hora.getMonth()}, ${agendamento.data_hora.getHours()}, ${agendamento.data_hora.getMinutes()}, '${
+            agendamento.cadastro_sus
+          }')`;
+          console.log("sql solo", sql);
+          await banco.exec(sql).catch((err) => {
+            console.log("Error na inserção:", err);
+            return "Error ao inserir o Agendamento";
+          });
         }
       } else {
         console.log("sql agendamento paciente que não existe");
